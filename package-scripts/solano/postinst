@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Perform necessary solano setup steps
+# after package is installed.
+#
+
+PROGNAME=`basename $0`
+
+ln -s /opt/solano/bin/solano /usr/sbin/solano
+
+error_exit()
+{
+  echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
+  exit 1
+}
+
+echo "Thank you for installing solano!"
+
+exit 0

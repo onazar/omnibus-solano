@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Perform necessary solano setup steps
+# prior to installing package.
+#
+
+PROGNAME=`basename $0`
+
+if [ -f /usr/sbin/solano ]; then
+    unlink /usr/sbin/solano
+fi
+
+error_exit()
+{
+  echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
+  exit 1
+}
+
+exit 0
