@@ -1,0 +1,17 @@
+driver:
+  name: docker
+  socket: <%= ENV['DOCKER_HOST'] %>
+  use_sudo: false
+
+provisioner:
+  name: chef_zero
+
+platforms:
+  - name: ubuntu-12.04
+    driver_config:
+      image: ubuntu:12.04
+      platform: ubuntu
+      dockerfile: ubuntu12.04-dockerfile
+
+suites:
+  - name: default
