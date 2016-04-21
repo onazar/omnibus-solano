@@ -73,6 +73,8 @@ GEM
       json_pure (>= 1.8.1)
     json (1.8.3)
     json_pure (1.8.3)
+    kitchen-docker (2.3.0)
+      test-kitchen (>= 1.0.0)
     kitchen-vagrant (0.20.0)
       test-kitchen (~> 1.4)
     libyajl2 (1.2.0)
@@ -178,6 +180,7 @@ PLATFORMS
 
 DEPENDENCIES
   berkshelf (~> 4.0.1)
+  kitchen-docker
   kitchen-vagrant (~> 0.18)
   omnibus (~> 5.3)
   omnibus-software!
