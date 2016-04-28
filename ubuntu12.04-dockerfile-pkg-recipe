@@ -1,0 +1,29 @@
+# Use Ubuntu Precise
+FROM ubuntu:12.04
+
+## Basic Docker Setup for Ubuntu
+# Disable Upstart
+RUN dpkg-divert --local --rename --add /sbin/initctl
+RUN ln -sf /bin/true /sbin/initctl
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update
+RUN apt-get install -y sudo openssh-server curl lsb-release
+
+## Add Test-Kitchen Dependencies
+RUN if ! getent passwd kitchen; then useradd -d /home/kitchen -m -s /bin/bash kitchen; fi
+RUN echo kitchen:kitchen | chpasswd
+RUN echo 'kitchen ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN mkdir -p /etc/sudoers.d
+RUN echo 'kitchen ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/kitchen
+RUN chmod 0440 /etc/sudoers.d/kitchen
+
+# Generate keys
+RUN [ ! -d /home/kitchen/.ssh ] && mkdir /home/kitchen/.ssh
+RUN chown -R kitchen /home/kitchen/.ssh
+RUN chmod 0700 /home/kitchen/.ssh
+COPY .kitchen/docker_id_rsa.pub /tmp/docker_pub_key
+RUN cat /tmp/docker_pub_key >> /home/kitchen/.ssh/authorized_keys
+
+## Copy sources to build solano-cli package
+COPY . /home/kitchen/solano
+

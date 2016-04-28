@@ -10,3 +10,5 @@ group :integration do
   cookbook 'freebsd',  '~> 0.3'
   cookbook 'yum-epel', '~> 0.6'
 end
+
+cookbook 'solano-cli', :path => './cookbooks/solano-cli'

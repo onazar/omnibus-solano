@@ -1,0 +1,48 @@
+# Use Ubuntu Precise
+FROM ubuntu:12.04
+
+## Basic Docker Setup for Ubuntu
+# Disable Upstart
+RUN dpkg-divert --local --rename --add /sbin/initctl
+RUN ln -sf /bin/true /sbin/initctl
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update
+RUN apt-get install -y sudo openssh-server curl lsb-release
+
+## Add Test-Kitchen Dependencies
+RUN if ! getent passwd kitchen; then useradd -d /home/kitchen -m -s /bin/bash kitchen; fi
+RUN echo kitchen:kitchen | chpasswd
+RUN echo 'kitchen ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN mkdir -p /etc/sudoers.d
+RUN echo 'kitchen ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/kitchen
+RUN chmod 0440 /etc/sudoers.d/kitchen
+
+# Generate keys
+RUN [ ! -d /home/kitchen/.ssh ] && mkdir /home/kitchen/.ssh
+RUN chown -R kitchen /home/kitchen/.ssh
+RUN chmod 0700 /home/kitchen/.ssh
+COPY .kitchen/docker_id_rsa.pub /tmp/docker_pub_key
+RUN cat /tmp/docker_pub_key >> /home/kitchen/.ssh/authorized_keys
+
+#RUN [ ! -f /home/kitchen/.ssh/docker_id_rsa ] && \
+#    ssh-keygen -t rsa -N kitchen -f /home/kitchen/.ssh/docker_id_rsa && \
+#    [ -f /home/kitchen/.ssh/docker_id_rsa.pub ] && \
+#    cat /home/kitchen/.ssh/docker_id_rsa.pub >> /home/kitchen/.ssh/authorized_keys
+
+## Create workdir
+RUN mkdir -p /home/kitchen/solano
+RUN chown -R kitchen /home/kitchen/solano
+RUN chmod 0700 /home/kitchen/solano
+
+COPY files/build.sh /home/kitchen/build.sh
+RUN chmod 0777 /home/kitchen/build.sh
+
+## ONBUILD to build project
+COPY . /home/kitchen/solano
+
+#WORKDIR /home/kitchen/solano
+#ONBUILD RUN bash -c 'source /home/kitchen/load-omnibus-toolchain.sh ; bundle install --binstubs bundle_bin --without development test'
+RUN echo "Usage: docker run  -it -e OMNIBUS_PROJECT=solano -v pkg:/home/kitchen/solano/pkg solano-img"
+
+CMD /home/kitchen/build.sh
+

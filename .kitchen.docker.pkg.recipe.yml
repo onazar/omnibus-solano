@@ -1,0 +1,28 @@
+driver:
+  name: docker
+  socket: <%= ENV['DOCKER_HOST'] %>
+  use_sudo: false
+
+provisioner:
+  name: chef_zero
+  require_chef_omnibus: latest
+
+platforms:
+  - name: ubuntu-12.04
+    driver_config:
+      username: kitchen
+      password: kitchen
+      image: ubuntu:12.04
+      platform: ubuntu
+      dockerfile: ubuntu12.04-dockerfile-pkg-recipe
+
+suites:
+  - name: default
+    run_list:
+       - recipe[omnibus::default]
+       - recipe[solano-cli::default]
+    attributes:
+      omnibus:
+        build_user:          kitchen
+        build_user_password: kitchen
+        install_dir: /opt/solano
